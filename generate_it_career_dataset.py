@@ -6,108 +6,74 @@ RANDOM_SEED = 42
 TOTAL_SAMPLES = 500
 OUTPUT_FILE = "it_career_matching_dataset.csv"
 
-ZODIACS = [
-    "Aries",
-    "Taurus",
-    "Gemini",
-    "Cancer",
-    "Leo",
-    "Virgo",
-    "Libra",
-    "Scorpio",
-    "Sagittarius",
-    "Capricorn",
-    "Aquarius",
-    "Pisces",
+ZODIAC_OPTIONS = [
+    "Aries / Taurus / Gemini",
+    "Cancer / Leo / Virgo",
+    "Libra / Scorpio / Sagittarius",
+    "Capricorn / Aquarius / Pisces",
+    "Other / Skip",
 ]
 
-MBTI_TYPES = [
-    "INTJ",
-    "INTP",
-    "ENTJ",
-    "ENTP",
-    "INFJ",
-    "INFP",
-    "ENFJ",
-    "ENFP",
-    "ISTJ",
-    "ISFJ",
-    "ESTJ",
-    "ESFJ",
-    "ISTP",
-    "ISFP",
-    "ESTP",
-    "ESFP",
-    "Unknown",
+MBTI_OPTIONS = [
+    "Analyst (INTJ, INTP, ENTJ, ENTP)",
+    "Diplomat (INFJ, INFP, ENFJ, ENFP)",
+    "Sentinel (ISTJ, ISFJ, ESTJ, ESFJ)",
+    "Explorer (ISTP, ISFP, ESTP, ESFP)",
+    "Unknown / Skip",
 ]
 
-ENERGY_TYPES = ["Introvert", "Extrovert", "Ambivert"]
-OPTIONS = list("ABCDEFGHI")
+ENERGY_OPTIONS = [
+    "Deep Focus - တစ်ယောက်တည်း အေးဆေး အာရုံစိုက်ပြီး လုပ်ရတာ ပိုကြိုက်တယ်",
+    "Team Energy - သူငယ်ချင်းတွေနဲ့ စကားပြော၊ တိုင်ပင်ပြီး လုပ်ရတာ ပိုကြိုက်တယ်",
+    "Flexible - အခြေအနေပေါ်မူတည်ပြီး တစ်ယောက်တည်းရော အဖွဲ့လိုက်ရော ရတယ်",
+    "Leader Vibe - အစီအစဉ်ဆွဲပေးပြီး အဖွဲ့ကို ဦးဆောင်ရတာ ပိုကြိုက်တယ်",
+    "Hands-on - စာတွေဖတ်နေတာထက် ကိုယ်တိုင် လက်နဲ့ ထိတွေ့စမ်းသပ်ရတာ ကြိုက်တယ်",
+]
+
+PERSONALITY_OPTIONS = [
+    "Introvert - တစ်ယောက်တည်း အေးဆေး နေရတာ ပိုကြိုက်တယ် (Social Battery မြန်မြန်ကုန်တယ်)",
+    "Extrovert - လူအများကြီးနဲ့ ပျော်ပျော်ပါးပါး စကားပြောရတာ အားပြည့်တယ်",
+    "Ambivert - အခြေအနေပေါ်မူတည်ပြီး တစ်ယောက်တည်းရော အဖွဲ့လိုက်ရော အဆင်ပြေတယ်",
+    "Selective Introvert - ကိုယ်ခင်တဲ့ သူငယ်ချင်း အနည်းစုနဲ့ပဲ ပျော်ပျော်ပါးပါး နေတတ်တယ်",
+    "Social Butterfly - ဘယ်သူနဲ့မဆို ခွေခွေခေါက်ခေါက် ခင်းမင်လွယ်တယ်",
+]
+
+# Each behavioral response is the integer index (0–4) of the selected option.
+OPTIONS = [0, 1, 2, 3, 4]
+QUESTION_COLUMNS = [
+    "Q5_Event_Role",
+    "Q6_Assembly_Style",
+    "Q7_Puzzle_Approach",
+    "Q8_Tech_Preference",
+    "Q9_Learning_Style",
+    "Q10_Cleaning_Style",
+    "Q11_Proud_Compliment",
+]
 
 ROLE_MAP = {
-    "A": "Software_Development",
-    "B": "UI_UX_Design",
-    "C": "Data_Science_Analytics",
-    "D": "Cyber_Security_Networking",
-    "E": "Project_Management_Business",
-    "F": "AI_ML_Intelligent_Systems",
-    "G": "Cloud_Engineering_DevOps",
-    "H": "Game_Development",
-    "I": "IoT_Hardware_Embedded",
+    "Software_Development": 0,
+    "UI_UX_Design": 1,
+    "Data_Science_Analytics": 2,
+    "Cyber_Security_Networking": 3,
+    "Project_Management_Business": 4,
+    "AI_ML_Intelligent_Systems": 5,
+    "Cloud_Engineering_DevOps": 6,
+    "Game_Development": 7,
+    "IoT_Hardware_Systems": 8,
 }
+TARGET_COLUMNS = [f"Role_{role}" for role in ROLE_MAP]
 
-QUESTION_COLUMNS = [
-    "Q4_Project_Instinct",
-    "Q5_Assembly_Style",
-    "Q6_Trip_Role",
-    "Q7_Puzzle_Feeling",
-    "Q8_Cleaning_Style",
-    "Q9_Games_Activities",
-    "Q10_Learning_Style",
-    "Q11_Frustration",
-    "Q12_Proud_Compliment",
-]
-
-TARGET_COLUMNS = [f"Role_{role}" for role in ROLE_MAP.values()]
-
-ROLE_MBTI_WEIGHTS = {
-    "A": {"INTJ": 3.0, "INTP": 2.8, "ISTJ": 2.0, "ENTP": 1.8, "ISTP": 1.7},
-    "B": {"ISFP": 3.0, "INFP": 2.8, "ENFP": 2.2, "INFJ": 1.8, "ESFP": 1.7},
-    "C": {"INTP": 3.0, "INTJ": 2.6, "ISTJ": 2.0, "ENTJ": 1.8, "INFJ": 1.5},
-    "D": {"ISTJ": 3.0, "INTJ": 2.4, "ISTP": 2.2, "ESTP": 2.0, "ESTJ": 1.8},
-    "E": {"ENTJ": 3.0, "ENFJ": 2.8, "ESTJ": 2.5, "ESFJ": 2.0, "ENFP": 1.6},
-    "F": {"INTJ": 3.0, "INTP": 2.8, "ENTP": 2.0, "INFJ": 1.8, "ENTJ": 1.6},
-    "G": {"ISTJ": 2.6, "INTJ": 2.3, "ESTJ": 2.1, "ISTP": 2.0, "ENTJ": 1.7},
-    "H": {"ENTP": 2.7, "ENFP": 2.5, "ISTP": 2.0, "ISFP": 1.9, "INTP": 1.8},
-    "I": {"ISTP": 3.0, "INTP": 2.2, "ISTJ": 2.0, "ESTP": 1.8, "INTJ": 1.6},
-}
-
-ROLE_ENERGY_WEIGHTS = {
-    "A": {"Introvert": 2.5, "Ambivert": 1.6, "Extrovert": 0.9},
-    "B": {"Ambivert": 2.2, "Introvert": 1.6, "Extrovert": 1.3},
-    "C": {"Introvert": 2.4, "Ambivert": 1.7, "Extrovert": 0.8},
-    "D": {"Introvert": 2.2, "Ambivert": 1.6, "Extrovert": 1.0},
-    "E": {"Extrovert": 2.6, "Ambivert": 2.0, "Introvert": 0.8},
-    "F": {"Introvert": 2.4, "Ambivert": 1.7, "Extrovert": 0.8},
-    "G": {"Ambivert": 2.2, "Introvert": 1.8, "Extrovert": 1.1},
-    "H": {"Ambivert": 2.0, "Introvert": 1.5, "Extrovert": 1.5},
-    "I": {"Introvert": 2.0, "Ambivert": 1.8, "Extrovert": 1.0},
-}
-
-SECONDARY_OPTIONS = {
-    "A": ["F", "C", "G"],
-    "B": ["H", "E", "A"],
-    "C": ["F", "A", "D"],
-    "D": ["G", "A", "C"],
-    "E": ["B", "G", "C"],
-    "F": ["A", "C", "I"],
-    "G": ["D", "A", "E"],
-    "H": ["B", "A", "F"],
-    "I": ["G", "F", "D"],
+ROLE_WEIGHT_MATRIX = {
+    0: {"Software_Development": 3, "Game_Development": 2},
+    1: {"UI_UX_Design": 5},
+    2: {"Data_Science_Analytics": 3, "AI_ML_Intelligent_Systems": 3},
+    3: {"Cyber_Security_Networking": 3, "Cloud_Engineering_DevOps": 3},
+    4: {"Project_Management_Business": 3, "IoT_Hardware_Systems": 3},
 }
 
 
 def softmax(values, temperature=0.8):
+    """Convert scores to a numerically stable probability distribution."""
     scaled = np.asarray(values, dtype=float) / temperature
     scaled -= np.max(scaled)
     exp_values = np.exp(scaled)
@@ -120,41 +86,36 @@ def weighted_choice(rng, choices, weights):
     return rng.choice(choices, p=probabilities)
 
 
-def make_weight_vector(primary_option):
-    weights = np.ones(len(OPTIONS), dtype=float)
-    weights[OPTIONS.index(primary_option)] = 7.0
-
-    for rank, option in enumerate(SECONDARY_OPTIONS[primary_option]):
-        weights[OPTIONS.index(option)] += 2.2 - (rank * 0.45)
-
-    return weights
-
-
-def sample_mbti(rng, primary_option):
-    weights = np.ones(len(MBTI_TYPES), dtype=float) * 0.65
-    weights[MBTI_TYPES.index("Unknown")] = 0.45
-
-    for mbti, boost in ROLE_MBTI_WEIGHTS[primary_option].items():
-        weights[MBTI_TYPES.index(mbti)] += boost
-
-    return weighted_choice(rng, MBTI_TYPES, weights)
-
-
-def sample_energy(rng, primary_option):
-    weights = [ROLE_ENERGY_WEIGHTS[primary_option][energy] for energy in ENERGY_TYPES]
-    return weighted_choice(rng, ENERGY_TYPES, weights)
-
-
 def balanced_archetypes(total_samples):
-    base_count = total_samples // len(OPTIONS)
-    remainder = total_samples % len(OPTIONS)
+    """Balance the five behavioral answer archetypes across generated rows."""
+    base_count, remainder = divmod(total_samples, len(OPTIONS))
+    return [
+        option
+        for index, option in enumerate(OPTIONS)
+        for _ in range(base_count + int(index < remainder))
+    ]
 
-    archetypes = []
-    for index, option in enumerate(OPTIONS):
-        count = base_count + int(index < remainder)
-        archetypes.extend([option] * count)
 
-    return archetypes
+def calculate_target_probabilities(answers, rng):
+    """Score answers, apply softmax, and normalize each target row to 1.0."""
+    scores = np.zeros(len(ROLE_MAP), dtype=float)
+    for answer in answers:
+        for role, weight in ROLE_WEIGHT_MATRIX[int(answer)].items():
+            scores[ROLE_MAP[role]] += weight
+
+    # Small noise and smoothing provide useful variation while preserving the
+    # scoring signal from the answers.
+    scores += rng.normal(loc=0.0, scale=0.12, size=len(scores))
+    scores = np.clip(scores, 0.0, None)
+    probabilities = softmax(scores, temperature=0.8)
+    probabilities += rng.uniform(0.0005, 0.004, size=len(probabilities))
+    probabilities /= probabilities.sum()
+
+    # Round to CSV precision and correct the final value so row probabilities
+    # sum exactly to 1.0 at that precision.
+    rounded = np.round(probabilities, 6)
+    rounded[-1] = round(float(rounded[-1] + (1.0 - rounded.sum())), 6)
+    return rounded
 
 
 def generate_dataset(total_samples=TOTAL_SAMPLES, seed=RANDOM_SEED):
@@ -165,43 +126,29 @@ def generate_dataset(total_samples=TOTAL_SAMPLES, seed=RANDOM_SEED):
     rows = []
     primary_roles = []
     for primary_option in archetypes:
-        primary_roles.append(ROLE_MAP[primary_option])
-        row = {
-            "Q1_Zodiac": rng.choice(ZODIACS),
-            "Q2_MBTI": sample_mbti(rng, primary_option),
-            "Q3_Energy": sample_energy(rng, primary_option),
-        }
+        # Keep the archetype answer most likely while allowing all five choices.
+        answer_weights = np.full(len(OPTIONS), 1.0, dtype=float)
+        answer_weights[primary_option] = 7.0
+        answer_weights += np.asarray([0.0, 0.25, 0.5, 0.75, 1.0])
+        probabilities = answer_weights / answer_weights.sum()
+        answers = rng.choice(OPTIONS, size=len(QUESTION_COLUMNS), p=probabilities)
 
-        answer_weights = make_weight_vector(primary_option)
-        primary_bias = rng.uniform(0.60, 0.80)
-        secondary_distribution = answer_weights.copy()
-        secondary_distribution[OPTIONS.index(primary_option)] = 0.0
-        secondary_distribution /= secondary_distribution.sum()
+        targets = calculate_target_probabilities(answers, rng)
+        primary_role = list(ROLE_MAP)[int(np.argmax(targets))]
+        primary_roles.append(primary_role)
 
-        option_probabilities = secondary_distribution * (1.0 - primary_bias)
-        option_probabilities[OPTIONS.index(primary_option)] = primary_bias
+        rows.append(
+            {
+                "Q1_Zodiac": rng.choice(ZODIAC_OPTIONS),
+                "Q2_MBTI": rng.choice(MBTI_OPTIONS),
+                "Q3_Energy": rng.choice(ENERGY_OPTIONS),
+                "Q4_Personality": rng.choice(PERSONALITY_OPTIONS),
+                **dict(zip(QUESTION_COLUMNS, answers.tolist())),
+                **dict(zip(TARGET_COLUMNS, targets.tolist())),
+            }
+        )
 
-        answers = rng.choice(OPTIONS, size=len(QUESTION_COLUMNS), p=option_probabilities)
-        row.update(dict(zip(QUESTION_COLUMNS, answers)))
-
-        counts = np.array([np.sum(answers == option) for option in OPTIONS], dtype=float)
-        counts += rng.normal(loc=0.0, scale=0.12, size=len(OPTIONS))
-        counts = np.clip(counts, 0.0, None)
-
-        role_probabilities = softmax(counts, temperature=0.8)
-        role_probabilities += rng.uniform(0.0005, 0.004, size=len(OPTIONS))
-        role_probabilities /= role_probabilities.sum()
-
-        for column, probability in zip(TARGET_COLUMNS, role_probabilities):
-            row[column] = round(float(probability), 6)
-
-        # Correct the final role after rounding so every row sums exactly to 1.0.
-        rounded_sum = sum(row[column] for column in TARGET_COLUMNS)
-        row[TARGET_COLUMNS[-1]] = round(row[TARGET_COLUMNS[-1]] + (1.0 - rounded_sum), 6)
-
-        rows.append(row)
-
-    return pd.DataFrame(rows), pd.Series(primary_roles, name="Primary_Archetype")
+    return pd.DataFrame(rows), pd.Series(primary_roles, name="Primary_Role")
 
 
 def main():
@@ -211,15 +158,15 @@ def main():
     print(f"Saved {len(df)} rows to {OUTPUT_FILE}")
     print("\nDataset preview:")
     print(df.head())
-    print("\nGenerated primary archetype distribution:")
+    print("\nGenerated primary role distribution:")
     print(primary_roles.value_counts().sort_index())
-    print("\nTop Softmax role distribution:")
+    print("\nTop softmax role distribution:")
     top_roles = df[TARGET_COLUMNS].idxmax(axis=1).str.replace("Role_", "", regex=False)
     print(top_roles.value_counts().sort_index())
-    print("\nQ4-Q12 answer distribution:")
-    print(df[QUESTION_COLUMNS].stack().value_counts(normalize=True).sort_index().round(4))
-    print("\nNumeric target summary:")
-    print(df[TARGET_COLUMNS].describe())
+    print("\nQ1-Q4 categorical answer distribution:")
+    print(df[["Q1_Zodiac", "Q2_MBTI", "Q3_Energy", "Q4_Personality"]].stack().value_counts())
+    print("\nBehavioral answer distribution:")
+    print(df[QUESTION_COLUMNS].stack().value_counts().sort_index())
     print("\nTarget row-sum check:")
     print(df[TARGET_COLUMNS].sum(axis=1).describe())
 

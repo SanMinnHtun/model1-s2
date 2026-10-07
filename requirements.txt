@@ -1,2 +1,7 @@
 streamlit
 numpy
+pandas
+fastapi
+pydantic
+scikit-learn
+joblib
