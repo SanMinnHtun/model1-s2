@@ -10,7 +10,6 @@ A small IT career quiz project with a FastAPI backend, a generated training data
 - `train_model.py` — trains and evaluates a multi-output Random Forest model, saving `career_model_pipeline.joblib`.
 - `interactive_it_career_recommender.py` — standalone terminal quiz/recommender.
 - `requirements.txt` — Python libraries and the Uvicorn ASGI server used by the project.
-- `render.yaml` — Render Blueprint configuration for deploying the API.
 
 **Model/API note:** the current FastAPI `/quiz/submit` endpoint uses the fixed `ROLE_WEIGHTS` scoring rules in `routes/quiz.py`. It does not load or call `career_model_pipeline.joblib`. `train_model.py` trains a separate model artifact; connecting that artifact to the API would be a further implementation step.
 
@@ -153,18 +152,27 @@ The API enables CORS for `http://localhost:3000` by default. Set `FRONTEND_URL` 
 
 ## Deploy the API to Render
 
-Follow these steps to deploy the FastAPI backend from this repository:
+Follow these steps to deploy the FastAPI backend as a Render Web Service:
 
-1. **Push the project to GitHub.** Make sure `app.py`, `routes/`, `requirements.txt`, and `render.yaml` are committed and pushed to the repository. The model and CSV files are not required to run the current API.
-2. **Sign in to Render.** Open [render.com](https://render.com/) and sign in, or create an account. If the repository is private, authorize Render to access it through your Git provider.
-3. **Create a Blueprint.** From the Render dashboard, click **New +** and choose **Blueprint**. Select the GitHub repository that contains this project and the branch you want Render to deploy.
-4. **Review the service.** Render reads `render.yaml` and shows a web service named `it-career-matching-api`. Review the settings and click **Apply** (or **Create Blueprint**) to start deployment.
-5. **Wait for the first deploy to finish.** Open the service's **Events** or **Logs** page. Wait until the deploy reports success. Render installs dependencies with `pip install -r requirements.txt` and starts the app with `uvicorn app:app --host 0.0.0.0 --port $PORT`.
-6. **Copy the service URL.** On the service page, copy its public URL, for example `https://it-career-matching-api.onrender.com`. Open that URL in a browser. The response should be `{"status":"ok"}`. Add `/docs` to the URL to open the interactive API documentation, or `/quiz/questions` to view the quiz questions.
-7. **Allow your Vercel site to call the API.** In Render, open the service's **Environment** page and add `FRONTEND_URL` with your Vercel origin, such as `https://your-frontend.vercel.app`. Enter the origin only: no trailing slash and no route path. To allow more than one exact domain, separate the origins with commas. Save the change and wait for Render to redeploy.
-8. **Set the API URL in Vercel.** In your Vercel project, add the environment variable for your framework as described in [Connect a Vercel frontend](#connect-a-vercel-frontend). Use the Render public URL from step 6, without a trailing slash, then redeploy the Vercel project.
+1. **Push the project to GitHub.** Make sure `app.py`, `routes/`, and `requirements.txt` are committed and pushed. The model and CSV files are not required to run the current API.
+2. **Sign in to Render.** Open [render.com](https://render.com/) and sign in. If the repository is private, authorize Render to access it through your Git provider.
+3. **Create a Web Service.** In the Render dashboard, click **New + → Web Service**, then connect the GitHub repository containing this project.
+4. **Choose the branch and configure the service.** Select the branch to deploy and use these settings:
 
-Render supplies the `PORT` environment variable at runtime, and the Blueprint configures `/` as the health check. You do not need to create a separate start command or manually enter a port when using the Blueprint.
+   | Setting | Value |
+   | --- | --- |
+   | Name | `it-career-matching-api` (or another available name) |
+   | Language / Runtime | `Python 3` |
+   | Build Command | `pip install -r requirements.txt` |
+   | Start Command | `uvicorn app:app --host 0.0.0.0 --port $PORT` |
+
+   Select the instance plan you want, then click **Create Web Service**.
+5. **Wait for deployment.** Watch the service's **Events** or **Logs** until the deploy succeeds. Render installs the dependencies and starts the FastAPI app.
+6. **Check the service URL.** Copy the public URL shown on the service page, for example `https://it-career-matching-api.onrender.com`. Open it in a browser; the response should be `{"status":"ok"}`. Add `/docs` for interactive API documentation or `/quiz/questions` to view the questions.
+7. **Allow your Vercel site to call the API.** In the Render service, open **Environment** and add `FRONTEND_URL` with your Vercel origin, such as `https://your-frontend.vercel.app`. Enter only the origin, without a trailing slash or route path. To allow multiple exact domains, separate them with commas. Save the change and wait for Render to redeploy.
+8. **Set the API URL in Vercel.** Add the environment variable for your framework as described in [Connect a Vercel frontend](#connect-a-vercel-frontend). Use the Render public URL from step 6 without a trailing slash, then redeploy the Vercel project.
+
+Render provides the `$PORT` environment variable at runtime. Keep `$PORT` in the Start Command exactly as shown so Uvicorn listens on the port Render assigns.
 
 ## Connect a Vercel frontend
 
