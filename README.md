@@ -9,7 +9,8 @@ A small IT career quiz project with a FastAPI backend, a generated training data
 - `generate_it_career_dataset.py` — generates `it_career_matching_dataset.csv`.
 - `train_model.py` — trains and evaluates a multi-output Random Forest model, saving `career_model_pipeline.joblib`.
 - `interactive_it_career_recommender.py` — standalone terminal quiz/recommender.
-- `requirements.txt` — Python libraries used by the project.
+- `requirements.txt` — Python libraries and the Uvicorn ASGI server used by the project.
+- `render.yaml` — Render Blueprint configuration for deploying the API.
 
 **Model/API note:** the current FastAPI `/quiz/submit` endpoint uses the fixed `ROLE_WEIGHTS` scoring rules in `routes/quiz.py`. It does not load or call `career_model_pipeline.joblib`. `train_model.py` trains a separate model artifact; connecting that artifact to the API would be a further implementation step.
 
@@ -19,7 +20,7 @@ There is no frontend included yet. The frontend section below describes how a we
 
 - Python 3.10 or newer is recommended.
 - `pip`
-- `uvicorn` to run the API server. It is not currently listed in `requirements.txt`, so install it separately as shown below.
+- Uvicorn is included in `requirements.txt` and runs the API server.
 
 ## Run the API locally
 
@@ -40,7 +41,6 @@ Install project dependencies and the ASGI server:
 
 ```bash
 python -m pip install -r requirements.txt
-python -m pip install uvicorn
 ```
 
 Start the development server:
@@ -149,7 +149,43 @@ console.log(result.primary_recommendation, result.runner_up);
 
 For a real form, build the payload from the user's selections rather than keeping the example values. For each behavioral question, submit the selected option's index within that question's `options` array, preserving the Q5–Q11 order.
 
-If the frontend runs on a different origin or port from the API, the browser may block requests until the backend allows that frontend origin through CORS. The current app does not configure CORS. For production, serve both behind a configured same origin or add a CORS policy restricted to the deployed frontend origin.
+The API enables CORS for `http://localhost:3000` by default. Set `FRONTEND_URL` to your deployed frontend origin on Render. Multiple origins can be comma-separated. Keep this set to the exact origin(s), including `https://`, without a path.
+
+## Deploy the API to Render
+
+Follow these steps to deploy the FastAPI backend from this repository:
+
+1. **Push the project to GitHub.** Make sure `app.py`, `routes/`, `requirements.txt`, and `render.yaml` are committed and pushed to the repository. The model and CSV files are not required to run the current API.
+2. **Sign in to Render.** Open [render.com](https://render.com/) and sign in, or create an account. If the repository is private, authorize Render to access it through your Git provider.
+3. **Create a Blueprint.** From the Render dashboard, click **New +** and choose **Blueprint**. Select the GitHub repository that contains this project and the branch you want Render to deploy.
+4. **Review the service.** Render reads `render.yaml` and shows a web service named `it-career-matching-api`. Review the settings and click **Apply** (or **Create Blueprint**) to start deployment.
+5. **Wait for the first deploy to finish.** Open the service's **Events** or **Logs** page. Wait until the deploy reports success. Render installs dependencies with `pip install -r requirements.txt` and starts the app with `uvicorn app:app --host 0.0.0.0 --port $PORT`.
+6. **Copy the service URL.** On the service page, copy its public URL, for example `https://it-career-matching-api.onrender.com`. Open that URL in a browser. The response should be `{"status":"ok"}`. Add `/docs` to the URL to open the interactive API documentation, or `/quiz/questions` to view the quiz questions.
+7. **Allow your Vercel site to call the API.** In Render, open the service's **Environment** page and add `FRONTEND_URL` with your Vercel origin, such as `https://your-frontend.vercel.app`. Enter the origin only: no trailing slash and no route path. To allow more than one exact domain, separate the origins with commas. Save the change and wait for Render to redeploy.
+8. **Set the API URL in Vercel.** In your Vercel project, add the environment variable for your framework as described in [Connect a Vercel frontend](#connect-a-vercel-frontend). Use the Render public URL from step 6, without a trailing slash, then redeploy the Vercel project.
+
+Render supplies the `PORT` environment variable at runtime, and the Blueprint configures `/` as the health check. You do not need to create a separate start command or manually enter a port when using the Blueprint.
+
+## Connect a Vercel frontend
+
+In the Vercel project, add an environment variable containing the deployed API's base URL (no trailing slash):
+
+| Frontend framework | Environment variable | Example |
+| --- | --- | --- |
+| Next.js (browser code) | `NEXT_PUBLIC_API_URL` | `https://it-career-matching-api.onrender.com` |
+| Vite | `VITE_API_URL` | `https://it-career-matching-api.onrender.com` |
+| Create React App | `REACT_APP_API_URL` | `https://it-career-matching-api.onrender.com` |
+
+Redeploy the Vercel project after adding or changing an environment variable. Use the matching variable in the frontend, then make requests to `${API_URL}/quiz/questions` and `${API_URL}/quiz/submit`. For example, in a Vite app:
+
+```js
+const API_URL = import.meta.env.VITE_API_URL;
+const response = await fetch(`${API_URL}/quiz/questions`);
+```
+
+For Next.js browser-side code, use `process.env.NEXT_PUBLIC_API_URL`. The Vercel variable must contain only the API base URL; the Render `FRONTEND_URL` setting must contain the frontend origin. These are separate settings on separate services. If using a custom Vercel domain, add that domain as `FRONTEND_URL` on Render as well.
+
+For local frontend development, set the frontend's API variable to `http://127.0.0.1:8000` and leave the backend's default CORS origin (`http://localhost:3000`) or set `FRONTEND_URL` to the actual local development origin.
 
 ## Generate data and train the standalone model
 
